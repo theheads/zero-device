@@ -15,12 +15,11 @@ module.exports = function(app) {
 
 function initialize(app) {
   app.use(cors())
-  app.use('/', router);
   app.use(bodyParser.urlencoded({extended: true, limit: '1mb'}));
   app.use(bodyParser.json({limit: '1mb'}));
 
   security(app)
   errors(app)
-
-  Mic.alwaysListening()
+  Mic.listen()
+  // Mic.alwaysListening()
 }

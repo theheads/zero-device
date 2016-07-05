@@ -16,10 +16,9 @@ var Mic = {
     Say.speak(text, 'Alex', 1, callback)
   },
   listen: function(callback, isConversation, alwaysOn) {
-    var processor = require(__dirname + '/processor.js');
     var micInstance = mic({ 'rate': '44100', 'channels': '1', 'debug': true, 'exitOnSilence': 2 });
     var micInputStream = micInstance.getAudioStream();
-    var outputFileStream = fs.WriteStream('test.raw');
+    var outputFileStream = fs.WriteStream('sound.raw');
     var count = 0;
     micInputStream.pipe(outputFileStream);
 
@@ -31,15 +30,21 @@ var Mic = {
       setTimeout(function() {
         micInstance.stop();
 
-        var cmd = 'sox -b 16 -e signed -c 1 -r 44100 /../audio/test.raw -r 44100 /../audio/test.wav';
+        var cmd = 'sox -b 16 -e signed -c 1 -r 44100 sound.raw -r 44100 sound.wav';
 
         exec(cmd, function(error, stdout, stderr) {
           count++
+
           if (alwaysOn) {
             witSpeechAPI.process(function(err, text) {
+              console.log(text, 'always ons')
               if (text.match(/zero/))  {
                 // process response
                 console.log(text)
+                axios.post('http://3cb459dd.ngrok.io/api/process', { text: text})
+                  .then(function(response) {
+                    console.log(response)
+                  })
                 // processor.parse(text)
               } else {
                 Mic.alwaysListening()
@@ -47,10 +52,18 @@ var Mic = {
             })
           } else {
             if (count  === 1) {
-              witSpeechAPI.process(function(err, text) {
-                // send to API
-                processResponse(err, text, isConversation, callback)
-              })
+              setTimeout(function() {
+                console.log('text test')
+                witSpeechAPI.process(function(err, text) {
+                  console.log(text)
+                  axios.post('http://3cb459dd.ngrok.io/api/process', {text: text})
+                    .then(function(response) {
+                      console.log(response)
+                    })
+                  // send to API
+                  // processResponse(err, text, isConversation, callback)
+                })
+              }, 1000)
             }
           }
 
