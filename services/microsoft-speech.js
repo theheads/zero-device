@@ -13,7 +13,7 @@ var SpeechAPI = {
     })
   },
   process: function(callback) {
-    speechToText(__dirname + '/../audio/test.wav', accessToken, function(err, res) {
+    speechToText(__dirname + '/../sound.wav', this.accessToken, function(err, res) {
       if(err) callback(err)
 
       console.log('Confidence ' + res.results[0].confidence + ' for: "' + res.results[0].lexical + '"');

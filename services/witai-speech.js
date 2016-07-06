@@ -14,7 +14,7 @@ var WIT = module.exports = {
       headers: header
     };
 
-    var stream = fs.createReadStream(__dirname + '/../audio/test.wav');
+    var stream = fs.createReadStream(__dirname + '/../sound.wav');
     axios.post('https://api.wit.ai/speech?v=20160526', stream, config)
       .then(function(res) {
         console.log(res.data, res.data['_text'])

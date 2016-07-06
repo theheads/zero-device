@@ -5,7 +5,7 @@ const fs = require('fs');
 
 var GoogleAPI = {
   process: function(callback) {
-    _processData(__dirname + '/../audio/test.wav', callback)
+    _processData(__dirname + '/../sound.wav', callback)
   }
 }
 

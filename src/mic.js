@@ -7,7 +7,7 @@ const googleSpeechAPI = require(__dirname + '/../services/google-speech.js');
 const witSpeechAPI = require(__dirname + '/../services/witai-speech.js');
 const axios = require("axios")
 const natural = require('natural');
-
+const Player = require('player')
 var Mic = {
   alwaysListening: function() {
     Mic.listen(console.log, false, true)
@@ -52,18 +52,21 @@ var Mic = {
             })
           } else {
             if (count  === 1) {
-              setTimeout(function() {
-                console.log('text test')
+
+                // microsoftSpeechAPI.process(function(err, text) {
+                // })
+                // googleSpeechAPI.process(function(err, text) {
+                // })
+
                 witSpeechAPI.process(function(err, text) {
-                  console.log(text)
-                  axios.post('http://3cb459dd.ngrok.io/api/process', {text: text})
+                  console.log(text, 'text')
+                  axios.post('https://fcd8157d.ngrok.io/process', {text: text})
                     .then(function(response) {
-                      console.log(response)
+                      var data = response.data
+                      console.log(data)
+                      processResponse(data.text, data.url, isConversation, callback)
                     })
-                  // send to API
-                  // processResponse(err, text, isConversation, callback)
                 })
-              }, 1000)
             }
           }
 
@@ -74,7 +77,14 @@ var Mic = {
   }
 }
 
-var processResponse = function(err, text, isConversation, callback) {
+var processResponse = function(text, url, isConversation, callback) {
+  Mic.speak(text, function() {
+    if (url) {
+      var player = new Player(url)
+      player.play()
+    }
+  })
+
   if (callback) callback(text)
   if (err) console.log(err)
   if (isConversation) processor.parse(text)
@@ -83,10 +93,4 @@ var processResponse = function(err, text, isConversation, callback) {
 module.exports = Mic;
 
 
-// googleSpeechAPI.process(function(err, text) {
-//   processResponse(err, text, isConversation, callback)
-// })
-//
-// microsoftSpeechAPI.process(function(err, text) {
-//   processResponse(err, text, isConversation, callback)
-// });
+;
