@@ -13,7 +13,7 @@
     "csurf": "^1.9.0",
     "dotenv": "^2.0.0",
     "ejs": "^2.3.4",
-    "express": "~4.13.3",
+    "express": "4.14.0",
     "express-rate-limit": "^2.1.0",
     "express-secure-only": "^0.2.1",
     "extend": "^3.0.0",
@@ -37,7 +37,8 @@
     "socket.io": "^1.4.6",
     "speaker": "^0.3.0",
     "vcap_services": "^0.1.7",
-    "ws": "^1.1.0"
+    "ws": "^1.1.0",
+    "snyk": "^1.17.0"
   },
   "repository": {
     "type": "git",
@@ -67,12 +68,15 @@
     "test": "npm run lint && npm run test-offline",
     "lint": "eslint .",
     "autofix": "eslint . --fix",
-    "test-offline": "mocha test/offline-test.js"
+    "test-offline": "mocha test/offline-test.js",
+    "snyk-protect": "snyk protect",
+    "prepublish": "npm run snyk-protect"
   },
   "devDependencies": {
     "eslint": "^2.5.3",
     "mocha": "^2.4.5",
     "nock": "^7.7.2",
     "supertest": "^1.2.0"
-  }
+  },
+  "snyk": true
 }
