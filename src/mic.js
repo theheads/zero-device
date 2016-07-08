@@ -55,11 +55,15 @@ var Mic = {
 
                 witSpeechAPI.process(function(err, text) {
                   console.log(text, 'text')
-                  axios.post('http://6808bc76.ngrok.io/process', {text: text})
-                    .then(function(response) {
-                      var data = response.data
-                      processResponse(data.text, data.url, isConversation, callback)
-                    })
+                  if (text === '' || text === null) {
+                    callback()
+                  } else {
+                    axios.post('http://6808bc76.ngrok.io/process', {text: text})
+                      .then(function(response) {
+                        var data = response.data
+                        processResponse(data.text, data.url, isConversation, callback)
+                      })
+                  }
                 })
             }
           }
