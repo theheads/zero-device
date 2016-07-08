@@ -1,0 +1,11 @@
+version: v1.5.0
+ignore: {}
+patch:
+  'npm:request:20160119':
+    - google-auth-library > request:
+        patched: '2016-07-08T17:23:50.373Z'
+  'npm:ws:20160624':
+    - socket.io > engine.io > ws:
+        patched: '2016-07-08T17:23:50.373Z'
+    - socket.io > socket.io-client > engine.io-client > ws:
+        patched: '2016-07-08T17:23:50.373Z'
