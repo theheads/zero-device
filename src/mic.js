@@ -37,22 +37,17 @@ var Mic = {
 
           if (alwaysOn) {
             witSpeechAPI.process(function(err, text) {
-              console.log(text, 'always ons')
               if (text.match(/zero/))  {
-                // process response
-                console.log(text)
-                axios.post('http://3cb459dd.ngrok.io/api/process', { text: text})
+                axios.post(' http://6808bc76.ngrok.io/api/process', { text: text})
                   .then(function(response) {
                     console.log(response)
                   })
-                // processor.parse(text)
               } else {
                 Mic.alwaysListening()
               }
             })
           } else {
             if (count  === 1) {
-
                 // microsoftSpeechAPI.process(function(err, text) {
                 // })
                 // googleSpeechAPI.process(function(err, text) {
@@ -60,12 +55,15 @@ var Mic = {
 
                 witSpeechAPI.process(function(err, text) {
                   console.log(text, 'text')
-                  axios.post('https://fcd8157d.ngrok.io/process', {text: text})
-                    .then(function(response) {
-                      var data = response.data
-                      console.log(data)
-                      processResponse(data.text, data.url, isConversation, callback)
-                    })
+                  if (text === '' || text === null) {
+                    callback()
+                  } else {
+                    axios.post('http://6808bc76.ngrok.io/process', {text: text})
+                      .then(function(response) {
+                        var data = response.data
+                        processResponse(data.text, data.url, isConversation, callback)
+                      })
+                  }
                 })
             }
           }
@@ -82,12 +80,13 @@ var processResponse = function(text, url, isConversation, callback) {
     if (url) {
       var player = new Player(url)
       player.play()
+      player.on('playend',function(item){
+        callback()
+      });
+    } else {
+      callback()
     }
   })
-
-  if (callback) callback(text)
-  if (err) console.log(err)
-  if (isConversation) processor.parse(text)
 }
 
 module.exports = Mic;
