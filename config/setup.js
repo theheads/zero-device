@@ -18,7 +18,8 @@ function initialize(app) {
   app.use(bodyParser.urlencoded({extended: true, limit: '1mb'}));
   app.use(bodyParser.json({limit: '1mb'}));
 
-  Microsoft.init()
+  // Trial ended
+  // Microsoft.init()
 
   security(app)
   errors(app)
