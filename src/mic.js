@@ -38,7 +38,7 @@ var Mic = {
           if (alwaysOn) {
             witSpeechAPI.process(function(err, text) {
               if (text.match(/zero/))  {
-                axios.post(' http://6808bc76.ngrok.io/api/process', { text: text})
+                axios.post('https://zero-api.herokuapp.com/process', { text: text})
                   .then(function(response) {
                     console.log(response)
                   })
@@ -48,19 +48,18 @@ var Mic = {
             })
           } else {
             if (count  === 1) {
-                // microsoftSpeechAPI.process(function(err, text) {
-                // })
-                // googleSpeechAPI.process(function(err, text) {
-                // })
+                // microsoftSpeechAPI.process(function(err, text) {})
+                // googleSpeechAPI.process(function(err, text) {})
 
                 witSpeechAPI.process(function(err, text) {
                   console.log(text, 'text')
-                  if (text === '' || text === null) {
+                  if (text === '' || text === null || text === undefined) {
                     callback()
                   } else {
-                    axios.post('http://6808bc76.ngrok.io/process', {text: text})
+                    axios.post('https://zero-api.herokuapp.com/process', {text: text})
                       .then(function(response) {
                         var data = response.data
+                        console.log('response', data.text, data.url)
                         processResponse(data.text, data.url, isConversation, callback)
                       })
                   }
@@ -75,18 +74,25 @@ var Mic = {
   }
 }
 
+var processNegativeResponse = function(callback) {
+  Mic.speak('I did not understand that please try again', callback)
+}
 var processResponse = function(text, url, isConversation, callback) {
-  Mic.speak(text, function() {
-    if (url) {
-      var player = new Player(url)
-      player.play()
-      player.on('playend',function(item){
-        callback()
-      });
-    } else {
-      callback()
-    }
-  })
+  if (!text) {
+    return callback()
+  } else {
+    Mic.speak(text, function() {
+      if (url) {
+        var player = new Player(url)
+        player.play()
+        player.on('playend',function(item){
+          callback()
+        });
+      } else {
+        if (callback) return callback()
+      }
+    })
+  }
 }
 
 module.exports = Mic;
