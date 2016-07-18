@@ -58,15 +58,15 @@ var Mic = {
                   console.log(text, 'text')
                   if (text === '' || text === null || text === undefined) {
                     console.log('no text found')
-                    callback()
+                    Mic.listen()
                   } else {
                     // axios.post('https://72a69421.ngrok.io/process', {text: text})
                     axios.post('https://zero-api.herokuapp.com/process', {text: text})
                       .then(function(response) {
                         var data = response.data
-                        console.log('response', data.text, data.url)
+                        console.log('response', data.text, data.url, callback)
                         if (data.text === 'no_match') {
-                          return callback()
+                          Mic.listen()
                         } else {
                           return processResponse(data.text, data.url, isConversation, callback)
                         }
@@ -95,14 +95,14 @@ var processResponse = function(text, url, isConversation, callback) {
         var player = new Player(url)
         player.play()
         player.on('playend',function(item){
-          callback()
+          Mic.listen()
         });
       } else {
-        if (callback) return callback()
+        Mic.listen()
       }
     })
   } else {
-    callback()
+    Mic.listen()
   }
 }
 
