@@ -17,7 +17,7 @@ var Mic = {
   },
   record: function(text, callback) {
   },
-  listen: function(callback, isConversation, alwaysOn) {
+  listen: function(alwaysOn) {
     var micInstance = mic({ 'rate': '44100', 'channels': '1', 'debug': true, 'exitOnSilence': 2 });
     var micInputStream = micInstance.getAudioStream();
     var outputFileStream = fs.WriteStream('sound.raw');
@@ -64,11 +64,11 @@ var Mic = {
                     axios.post('https://zero-api.herokuapp.com/process', {text: text})
                       .then(function(response) {
                         var data = response.data
-                        console.log('response', data.text, data.url, callback)
+                        console.log('response', data.text, data.url)
                         if (data.text === 'no_match') {
                           Mic.listen()
                         } else {
-                          return processResponse(data.text, data.url, isConversation, callback)
+                          return processResponse(data.text, data.url)
                         }
                       })
                   }
@@ -83,11 +83,11 @@ var Mic = {
   }
 }
 
-var processNegativeResponse = function(callback) {
-  Mic.speak('I did not understand that please try again', callback)
+var processNegativeResponse = function() {
+  Mic.speak('I did not understand that please try again', Mic.listen)
 }
-var processResponse = function(text, url, isConversation, callback) {
-  console.log('process response', text, url, isConversation, callback)
+var processResponse = function(text, url) {
+  console.log('process response', text, url)
 
   if (text) {
     Mic.speak(text, function() {
