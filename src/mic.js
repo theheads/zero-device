@@ -15,6 +15,8 @@ var Mic = {
   speak: function(text, callback) {
     Say.speak(text, 'Alex', 1, callback)
   },
+  record: function(text, callback) {
+  },
   listen: function(callback, isConversation, alwaysOn) {
     var micInstance = mic({ 'rate': '44100', 'channels': '1', 'debug': true, 'exitOnSilence': 2 });
     var micInputStream = micInstance.getAudioStream();
@@ -38,6 +40,7 @@ var Mic = {
           if (alwaysOn) {
             witSpeechAPI.process(function(err, text) {
               if (text.match(/zero/))  {
+                // axios.post('https://72a69421.ngrok.io/process', {text: text})
                 axios.post('https://zero-api.herokuapp.com/process', { text: text})
                   .then(function(response) {
                     console.log(response)
@@ -54,13 +57,19 @@ var Mic = {
                 witSpeechAPI.process(function(err, text) {
                   console.log(text, 'text')
                   if (text === '' || text === null || text === undefined) {
+                    console.log('no text found')
                     callback()
                   } else {
+                    // axios.post('https://72a69421.ngrok.io/process', {text: text})
                     axios.post('https://zero-api.herokuapp.com/process', {text: text})
                       .then(function(response) {
                         var data = response.data
                         console.log('response', data.text, data.url)
-                        processResponse(data.text, data.url, isConversation, callback)
+                        if (data.text === 'no_match') {
+                          return callback()
+                        } else {
+                          return processResponse(data.text, data.url, isConversation, callback)
+                        }
                       })
                   }
                 })
@@ -78,9 +87,9 @@ var processNegativeResponse = function(callback) {
   Mic.speak('I did not understand that please try again', callback)
 }
 var processResponse = function(text, url, isConversation, callback) {
-  if (!text) {
-    return callback()
-  } else {
+  console.log('process response', text, url, isConversation, callback)
+
+  if (text) {
     Mic.speak(text, function() {
       if (url) {
         var player = new Player(url)
@@ -92,6 +101,8 @@ var processResponse = function(text, url, isConversation, callback) {
         if (callback) return callback()
       }
     })
+  } else {
+    callback()
   }
 }
 
