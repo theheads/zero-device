@@ -1,15 +1,20 @@
 const AWS = require('aws-sdk');
 const s3 = new AWS.S3();
 
-s3.createBucket({Bucket: 'myBucket'}, function() {
-  var params = {Bucket: 'zerorecordings', Key: 'myKey', Body: 'Hello!'};
+var aws = {
+  upload: function(name, file, callback) {
 
-  s3.putObject(params, function(err, data) {
+    var params = {Bucket: 'zerorecordings', Key: name, Body: file};
+    s3.upload(params, function(err, data) {
 
-    if (err)
-      console.log(err)
-    else console.log("Successfully uploaded data to myBucket/myKey");
+      if (err) {
+        console.log(err)
+      } else {
+        console.log("Successfully uploaded data");
+      }
+      callback()
+    });
+  }
+}
 
-  });
-
-});
+module.exports = aws;

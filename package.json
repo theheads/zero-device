@@ -4,6 +4,7 @@
   "description": "Zero Device Software",
   "dependencies": {
     "async": "^1.5.2",
+    "aws-sdk": "^2.4.8",
     "axios": "^0.12.0",
     "bluebird": "^3.4.1",
     "body-parser": "~1.14.1",
@@ -34,11 +35,11 @@
     "ref": "^1.3.2",
     "request": "^2.72.0",
     "say": "^0.9.0",
+    "snyk": "^1.17.0",
     "socket.io": "^1.4.6",
     "speaker": "^0.3.0",
     "vcap_services": "^0.1.7",
-    "ws": "^1.1.0",
-    "snyk": "^1.17.0"
+    "ws": "^1.1.0"
   },
   "repository": {
     "type": "git",
