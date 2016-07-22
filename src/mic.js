@@ -18,7 +18,7 @@ var Mic = {
   say: function(text, callback) {
     Say.speak(text, 'Alex', 1, callback)
   },
-  record: function(text, callback) {
+  record: function(toUser, callback) {
     var micInstance = mic({ 'rate': '44100', 'channels': '1', 'debug': true, 'exitOnSilence': 2 });
     var micInputStream = micInstance.getAudioStream();
     var outputFileStream = fs.WriteStream('sound.raw');
@@ -36,22 +36,26 @@ var Mic = {
         var cmd = 'sox -b 16 -e signed -c 1 -r 44100 sound.raw -r 44100 sound.wav';
 
         exec(cmd, function(error, stdout, stderr) {
-          console.log(error, stdout, stderr)
           var stream  = fs.createReadStream(__dirname + '/../sound.wav')
-
-
           var file = ''
+
           stream.on('data', function(data){
             file += data
           })
           stream.on('end', function (){
             // todo name it the users contact + file name
             var fileName = 'file' + Date.now() + '.wav'
-            aws.upload(fileName, file, console.log)
+            var user = "johnnywu"
+            aws.upload(fileName, file, user, console.log)
+
             axios.post('http://85060886.ngrok.io/record', {
-                file: fileName
+            // axios.post('https://zero-api.herokuapp.com/record', {
+                file: fileName,
+                from: user,
+                to: toUser
               })
               .then(function (response) {
+                processResponse(response.text + response.name)
                 console.log(response);
               })
               .catch(function (error) {
@@ -86,8 +90,8 @@ var Mic = {
           if (alwaysOn) {
             witSpeechAPI.process(function(err, text) {
               if (text.match(/zero/))  {
-                // axios.post('http://85060886.ngrok.io/process', {text: text})
-                axios.post('https://zero-api.herokuapp.com/process', { text: text})
+                axios.post('http://85060886.ngrok.io/process', {text: text})
+                // axios.post('https://zero-api.herokuapp.com/process', { text: text})
                   .then(function(response) {
                     console.log(response)
                   })
@@ -114,11 +118,16 @@ var Mic = {
                     axios.post('https://zero-api.herokuapp.com/process', {text: text})
                       .then(function(response) {
                         var data = response.data
-                        console.log('response', data.text, data.url)
                         if (data.text === 'no_match') {
                           Mic.listen()
                         } else {
-                          return processResponse(data.text, data.url)
+                          if (response.data.name) {
+                            Mic.say('What do you want to record?', function() {
+                              Mic.record(name, console.log)
+                            })
+                          } else {
+                            return processResponse(data.text, data.url)
+                          }
                         }
                       })
                   }
