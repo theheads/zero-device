@@ -11,18 +11,20 @@ const natural = require('natural')
 const Player = require('player')
 const http = require('http')
 const request = require('request')
+const co = require('co')
+
 var Mic = {
   alwaysListening: function() {
     Mic.listen(console.log, false, true)
   },
   say: function(text, callback) {
-    Say.speak(text, 'Alex', 1, callback)
+    Say.speak(text, 'Agnes', 0.9, callback)
   },
   record: function(toUser, callback) {
-    var micInstance = mic({ 'rate': '44100', 'channels': '1', 'debug': true, 'exitOnSilence': 2 });
+    var micInstance = mic({ 'rate': '44100', 'channels': '1', 'debug': true, 'exitOnSilence': 8 });
     var micInputStream = micInstance.getAudioStream();
     var outputFileStream = fs.WriteStream('sound.raw');
-    var count = 0;
+
     micInputStream.pipe(outputFileStream);
 
     micInputStream.on('data', function(data) {
@@ -55,8 +57,7 @@ var Mic = {
                 to: toUser
               })
               .then(function (response) {
-                processResponse(response.text + response.name)
-                console.log(response);
+                processResponse(response.data.text)
               })
               .catch(function (error) {
                 console.log(error);
@@ -68,7 +69,7 @@ var Mic = {
     micInstance.start();
   },
   listen: function(alwaysOn) {
-    var micInstance = mic({ 'rate': '44100', 'channels': '1', 'debug': true, 'exitOnSilence': 2 });
+    var micInstance = mic({ 'rate': '44100', 'channels': '1', 'debug': true, 'exitOnSilence': 4 });
     var micInputStream = micInstance.getAudioStream();
     var outputFileStream = fs.WriteStream('sound.raw');
     var count = 0;
@@ -107,15 +108,12 @@ var Mic = {
                 witSpeechAPI.process(function(err, text) {
                   console.log(text, 'text')
 
-                  if (text.indexOf('record') > -1) {
-                    // trigger record for audio purposes
-                  }
                   if (text === '' || text === null || text === undefined) {
                     console.log('no text found')
                     Mic.listen()
                   } else {
-                    // axios.post('https://72a69421.ngrok.io/process', {text: text})
-                    axios.post('https://zero-api.herokuapp.com/process', {text: text})
+                    axios.post('https://85060886.ngrok.io/process', {text: text})
+                    // axios.post('https://zero-api.herokuapp.com/process', {text: text})
                       .then(function(response) {
                         var data = response.data
                         if (data.text === 'no_match') {
@@ -123,10 +121,10 @@ var Mic = {
                         } else {
                           if (response.data.name) {
                             Mic.say('What do you want to record?', function() {
-                              Mic.record(name, console.log)
+                              Mic.record(response.data.name, console.log)
                             })
                           } else {
-                            return processResponse(data.text, data.url)
+                            return processResponse(data.text, data.url, data.name)
                           }
                         }
                       })
@@ -142,10 +140,14 @@ var Mic = {
   }
 }
 
+var onerror = function(err) {
+  console.error(err.stack)
+}
+
 var processNegativeResponse = function() {
   Mic.say('I did not understand that please try again', Mic.listen)
 }
-var processResponse = function(text, url) {
+var processResponse = function(text, url, name) {
   console.log('process response', text, url)
 
   if (text) {

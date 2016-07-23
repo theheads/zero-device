@@ -23,7 +23,7 @@ function initialize(app) {
 
   security(app)
   errors(app)
-  // Mic.listen()
-  Mic.record('Kush')
+  Mic.listen()
+  // Mic.record('Kush')
   // Mic.alwaysListening()
 }
