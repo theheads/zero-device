@@ -18,7 +18,7 @@ var Mic = {
     Mic.listen(console.log, false, true)
   },
   say: function(text, callback) {
-    Say.speak(text, 'Agnes', 0.9, callback)
+    Say.speak(text, 'Kathy', 1, callback)
   },
   record: function(toUser, callback) {
     var micInstance = mic({ 'rate': '44100', 'channels': '1', 'debug': true, 'exitOnSilence': 8 });
