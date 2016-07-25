@@ -9,3 +9,6 @@ patch:
         patched: '2016-07-08T17:23:50.373Z'
     - socket.io > socket.io-client > engine.io-client > ws:
         patched: '2016-07-08T17:23:50.373Z'
+  'npm:tough-cookie:20160722':
+    - googleapis > request > tough-cookie:
+        patched: '2016-07-25T09:50:59.788Z'
