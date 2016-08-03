@@ -18,7 +18,7 @@ var Mic = {
     Mic.listen(console.log, false, true)
   },
   say: function(text, callback) {
-    Say.speak(text, 'Kathy', 1, callback)
+    Say.speak(text, VOICE, 1, callback)
   },
   record: function(toUser, callback) {
     var micInstance = mic({ 'rate': '44100', 'channels': '1', 'debug': true, 'exitOnSilence': 8 });
@@ -45,7 +45,6 @@ var Mic = {
             file += data
           })
           stream.on('end', function (){
-            // todo name it the users contact + file name
             var fileName = 'file' + Date.now() + '.wav'
             var user = "johnnywu"
             aws.upload(fileName, file, user, console.log)
@@ -60,7 +59,7 @@ var Mic = {
                 processResponse(response.data.text)
               })
               .catch(function (error) {
-                console.log(error);
+                processNoResponse()
               });
           })
         });
@@ -86,53 +85,29 @@ var Mic = {
         var cmd = 'sox -b 16 -e signed -c 1 -r 44100 sound.raw -r 44100 sound.wav';
 
         exec(cmd, function(error, stdout, stderr) {
-          count++
+          witSpeechAPI.process(function(err, text) {
+            console.log(text, 'text')
 
-          if (alwaysOn) {
-            witSpeechAPI.process(function(err, text) {
-              if (text.match(/zero/))  {
-                // axios.post('http://d1b1fa90.ngrok.io/process', {text: text})
-                axios.post('https://zero-api.herokuapp.com/process', { text: text})
-                  .then(function(response) {
-                    console.log('response was given')
-                    console.log(response)
-                  })
-              } else {
-                Mic.alwaysListening()
-              }
-            })
-          } else {
-            if (count  === 1) {
-                // microsoftSpeechAPI.process(function(err, text) {})
-                // googleSpeechAPI.process(function(err, text) {})
-
-                witSpeechAPI.process(function(err, text) {
-                  console.log(text, 'text')
-
-                  if (text === '' || text === null || text === undefined) {
-                    console.log('no text found')
-                    Mic.listen()
+            if (text === '' || text === null || text === undefined) {
+              processNoResponse()
+            } else {
+              // axios.post('https://d1b1fa90.ngrok.io/process', {text: text})
+              axios.post('https://zero-api.herokuapp.com/process', {text: text})
+                .then(function(response) {
+                  var data = response.data
+                  if (data.text === 'no_match') {
+                    processNoResponse()
                   } else {
-                    // axios.post('https://d1b1fa90.ngrok.io/process', {text: text})
-                    axios.post('https://zero-api.herokuapp.com/process', {text: text})
-                      .then(function(response) {
-                        console.log('response was given')
-                        var data = response.data
-                        if (data.text === 'no_match') {
-                          Mic.listen()
-                        } else {
-                          if (response.data.name) {
-                            Mic.say('What do you want to record?', function() {
-                              Mic.record(response.data.name, console.log)
-                            })
-                          } else {
-                            return processResponse(data.text, data.url, data.name)
-                          }
-                        }
+                    if (response.data.name) {
+                      Mic.say('What do you want to record?', function() {
+                        Mic.record(response.data.name, console.log)
                       })
+                    } else {
+                      return processResponse(data.text, data.url, data.name)
+                    }
                   }
                 })
-            }
+            })
           }
 
         });
@@ -142,30 +117,20 @@ var Mic = {
   }
 }
 
-var onerror = function(err) {
-  console.error(err.stack)
-}
-
-var processNegativeResponse = function() {
+var processNoResponse = function() {
   Mic.say('I did not understand that please try again', Mic.listen)
 }
+
 var processResponse = function(text, url, name) {
   console.log('process response', text, url)
-
   if (text) {
     Mic.say(text, function() {
       if (url) {
         var player = new Player(url)
         player.play()
-        player.on('playend',function(item){
-          Mic.listen()
-        });
-      } else {
-        Mic.listen()
+        player.on('playend',function(item){});
       }
     })
-  } else {
-    Mic.listen()
   }
 }
 
