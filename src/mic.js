@@ -2,8 +2,6 @@ const mic = require('mic')
 const fs = require('fs')
 const Say = require("say")
 const exec = require('child_process').exec
-const microsoftSpeechAPI = require(__dirname + '/../services/microsoft-speech.js')
-const googleSpeechAPI = require(__dirname + '/../services/google-speech.js')
 const witSpeechAPI = require(__dirname + '/../services/witai-speech.js')
 const aws = require(__dirname + '/aws.js')
 const axios = require("axios")
@@ -13,6 +11,7 @@ const http = require('http')
 const request = require('request')
 const co = require('co')
 
+console.log("Initializing microphone")
 var Mic = {
   alwaysListening: function() {
     Mic.listen(console.log, false, true)
@@ -107,8 +106,8 @@ var Mic = {
                     }
                   }
                 })
-            })
-          }
+            }
+          })
 
         });
       }, 2000);
@@ -135,6 +134,3 @@ var processResponse = function(text, url, name) {
 }
 
 module.exports = Mic;
-
-
-;

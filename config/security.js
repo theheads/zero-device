@@ -10,7 +10,6 @@ const helmet = require('helmet')
 module.exports = function(app) {
   app.enable('trust proxy');
 
-  console.log("setting up security")
   // 1. redirects http to https
   app.use(secure());
 

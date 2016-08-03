@@ -11,11 +11,13 @@ const bodyParser = require('body-parser')
 const path = require('path')
 
 
-
-// require('./config/error-handler')(app)
-// security(app)
-
+console.log('Initializing application...')
 const app = express()
+
+require('./config/error-handler')(app)
+security(app)
+
+
 app.set('port', process.env.PORT || 3001)
 app.use(bodyParser.json());
 
