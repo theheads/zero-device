@@ -1,23 +1,42 @@
 'use strict';
 
 const express = require('express')
+const Mic = require(__dirname + '/src/mic.js')
+const extend = require('util')._extend
+const exec = require('child_process').exec
+const security = require(__dirname + '/config/security.js')
 const setup = require(__dirname + '/config/setup.js')
+const cors = require('cors')
+const bodyParser = require('body-parser')
+const path = require('path')
+
+
+
+// require('./config/error-handler')(app)
+// security(app)
+
 const app = express()
+app.set('port', process.env.PORT || 3001)
+app.use(bodyParser.json());
 
-require('dotenv').load({silent: true})
-require('./config/error-handler')(app)
 
-// const co = require('co')
-  // co(function *(){
-  //   // resolve multiple promises in parallel
-  //   var a = Promise.resolve(function() { return 1 + 2});
-  //   var b = Promise.resolve(2);
-  //   var c = Promise.resolve(3);
-  //   var res = yield [a, b, c];
-  //   console.log(res[0]);
-  //   // => [1, 2, 3]
-  // }).catch(console.log);
+// Cors support
+app.use(function(req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  next();
+});
 
-setup(app)
+
+app.all('/', function(req, res) {
+  res.send()
+})
+app.all('/start', function(req, res) {
+  Mic.listen()
+  res.send({})
+})
+
+app.listen(process.env.PORT || 3001)
+
 
 module.exports = app;

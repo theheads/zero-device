@@ -1,2 +1,2 @@
->aplay -D plughw:CARD=Set,DEV=0  --format S16_LE --rate 44100 -c1 sound.wav
+aplay -D plughw:CARD=Set,DEV=0  --format S16_LE --rate 44100 -c1 sound.wav
 arecord -D plughw:CARD=Device,DEV=0 --format S16_LE --rate 44100 -c1 sound2.wav

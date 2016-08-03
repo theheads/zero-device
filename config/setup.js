@@ -9,6 +9,7 @@ const express = require('express')
 const cors = require('cors')
 const bodyParser = require('body-parser')
 const Microsoft = require(__dirname + '/../services/microsoft-speech.js')
+
 module.exports = function(app) {
   initialize(app)
 };
@@ -18,12 +19,18 @@ function initialize(app) {
   app.use(bodyParser.urlencoded({extended: true, limit: '1mb'}));
   app.use(bodyParser.json({limit: '1mb'}));
 
+  app.all('/start', function(req, res) {
+    Mic.listen()
+    res.send({})
+  })
+
+
   // Trial ended
   // Microsoft.init()
 
   security(app)
   errors(app)
-  Mic.listen()
+  // Mic.listen()
   // Mic.record('Kush')
   // Mic.alwaysListening()
 }

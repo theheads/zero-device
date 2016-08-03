@@ -50,7 +50,7 @@ var Mic = {
             var user = "johnnywu"
             aws.upload(fileName, file, user, console.log)
 
-            axios.post('http://85060886.ngrok.io/record', {
+            axios.post('http://3edcac4d.ngrok.io/record', {
             // axios.post('https://zero-api.herokuapp.com/record', {
                 file: fileName,
                 from: user,
@@ -91,9 +91,10 @@ var Mic = {
           if (alwaysOn) {
             witSpeechAPI.process(function(err, text) {
               if (text.match(/zero/))  {
-                axios.post('http://85060886.ngrok.io/process', {text: text})
-                // axios.post('https://zero-api.herokuapp.com/process', { text: text})
+                // axios.post('http://3edcac4d.ngrok.io/process', {text: text})
+                axios.post('https://zero-api.herokuapp.com/process', { text: text})
                   .then(function(response) {
+                    console.log('response was given')
                     console.log(response)
                   })
               } else {
@@ -112,9 +113,10 @@ var Mic = {
                     console.log('no text found')
                     Mic.listen()
                   } else {
-                    axios.post('https://85060886.ngrok.io/process', {text: text})
-                    // axios.post('https://zero-api.herokuapp.com/process', {text: text})
+                    // axios.post('https://85060886.ngrok.io/process', {text: text})
+                    axios.post('https://zero-api.herokuapp.com/process', {text: text})
                       .then(function(response) {
+                        console.log('response was given')
                         var data = response.data
                         if (data.text === 'no_match') {
                           Mic.listen()
