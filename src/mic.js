@@ -91,7 +91,7 @@ var Mic = {
           if (alwaysOn) {
             witSpeechAPI.process(function(err, text) {
               if (text.match(/zero/))  {
-                // axios.post('http://3edcac4d.ngrok.io/process', {text: text})
+                // axios.post('http://d1b1fa90.ngrok.io/process', {text: text})
                 axios.post('https://zero-api.herokuapp.com/process', { text: text})
                   .then(function(response) {
                     console.log('response was given')
@@ -113,7 +113,7 @@ var Mic = {
                     console.log('no text found')
                     Mic.listen()
                   } else {
-                    // axios.post('https://85060886.ngrok.io/process', {text: text})
+                    // axios.post('https://d1b1fa90.ngrok.io/process', {text: text})
                     axios.post('https://zero-api.herokuapp.com/process', {text: text})
                       .then(function(response) {
                         console.log('response was given')
