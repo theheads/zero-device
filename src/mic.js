@@ -10,40 +10,42 @@ const Player = require('player')
 const http = require('http')
 const request = require('request')
 const co = require('co')
+const open = require('open')
+const setAlarm = require(__dirname + "/../config/alarm")
 
 console.log("Initializing microphone")
 var Mic = {
-  alwaysListening: function() {
-    Mic.listen(console.log, false, true)
+  triggerListening: () => {
+    this.say('Hi', Mic.listen)
   },
-  say: function(text, callback) {
-    Say.speak(text, VOICE, 1, callback)
+  say: (text, callback) => {
+    Say.speak(text, global.VOICE || 'kathy', 1, callback)
   },
-  record: function(toUser, callback) {
+  record: (toUser, callback) => {
     var micInstance = mic({ 'rate': '44100', 'channels': '1', 'debug': true, 'exitOnSilence': 8 });
     var micInputStream = micInstance.getAudioStream();
     var outputFileStream = fs.WriteStream('sound.raw');
 
     micInputStream.pipe(outputFileStream);
 
-    micInputStream.on('data', function(data) {
+    micInputStream.on('data',(data) => {
       console.log("Received Input Stream: " + data.length);
     });
 
-    micInputStream.on('silence', function() {
-      setTimeout(function() {
+    micInputStream.on('silence', () => {
+      setTimeout(() => {
         micInstance.stop();
 
         var cmd = 'sox -b 16 -e signed -c 1 -r 44100 sound.raw -r 44100 sound.wav';
 
-        exec(cmd, function(error, stdout, stderr) {
+        exec(cmd, (error, stdout, stderr) => {
           var stream  = fs.createReadStream(__dirname + '/../sound.wav')
           var file = ''
 
-          stream.on('data', function(data){
+          stream.on('data', (data) => {
             file += data
           })
-          stream.on('end', function (){
+          stream.on('end',() => {
             var fileName = 'file' + Date.now() + '.wav'
             var user = "johnnywu"
             aws.upload(fileName, file, user, console.log)
@@ -54,10 +56,10 @@ var Mic = {
                 from: user,
                 to: toUser
               })
-              .then(function (response) {
+              .then((response) => {
                 processResponse(response.data.text)
               })
-              .catch(function (error) {
+              .catch((error) => {
                 processNoResponse()
               });
           })
@@ -66,48 +68,52 @@ var Mic = {
     });
     micInstance.start();
   },
-  listen: function(alwaysOn) {
+  listen: () => {
     var micInstance = mic({ 'rate': '44100', 'channels': '1', 'debug': true, 'exitOnSilence': 4 });
     var micInputStream = micInstance.getAudioStream();
     var outputFileStream = fs.WriteStream('sound.raw');
     var count = 0;
+
+    global.COMPLETED = false
+
     micInputStream.pipe(outputFileStream);
 
-    micInputStream.on('data', function(data) {
+    micInputStream.on('data', (data) => {
       console.log("Received Input Stream: " + data.length);
     });
 
-    micInputStream.on('silence', function() {
-      setTimeout(function() {
+    micInputStream.on('silence', () => {
+      setTimeout(() => {
         micInstance.stop();
-
         var cmd = 'sox -b 16 -e signed -c 1 -r 44100 sound.raw -r 44100 sound.wav';
+        count++
+        exec(cmd, (error, stdout, stderr) => {
+          if (count === 1) {
+            witSpeechAPI.process((err, text) => {
+              console.log(text, 'text')
 
-        exec(cmd, function(error, stdout, stderr) {
-          witSpeechAPI.process(function(err, text) {
-            console.log(text, 'text')
-
-            if (text === '' || text === null || text === undefined) {
-              processNoResponse()
-            } else {
-              // axios.post('https://d1b1fa90.ngrok.io/process', {text: text})
-              axios.post('https://zero-api.herokuapp.com/process', {text: text})
-                .then(function(response) {
-                  var data = response.data
-                  if (data.text === 'no_match') {
-                    processNoResponse()
-                  } else {
-                    if (response.data.name) {
-                      Mic.say('What do you want to record?', function() {
-                        Mic.record(response.data.name, console.log)
-                      })
+              if (text === '' || text === null || text === undefined) {
+                processNoResponse()
+              } else {
+                // axios.post('https://d1b1fa90.ngrok.io/process', {text: text})
+                axios.post('https://zero-api.herokuapp.com/process', {text: text})
+                  .then((response) => {
+                    var data = response.data
+                    if (data.text === 'no_match') {
+                      processNoResponse()
                     } else {
-                      return processResponse(data.text, data.url, data.name)
+                      if (response.data.name) {
+                        Mic.say('What do you want to record?', () => {
+                          Mic.record(response.data.name, console.log)
+                        })
+                      } else {
+                        return processResponse(data.text, data.url, data.name, data.alarm)
+                      }
                     }
-                  }
-                })
-            }
-          })
+                  })
+              }
+            })
+          }
 
         });
       }, 2000);
@@ -116,18 +122,29 @@ var Mic = {
   }
 }
 
-var processNoResponse = function() {
+var processNoResponse = () => {
   Mic.say('I did not understand that please try again', Mic.listen)
 }
 
-var processResponse = function(text, url, name) {
+var processAlarm = (alarm) => {
+  if (alarm.set === true) {
+    setAlarm(alarm.hour, null, false)
+  }
+  if (alarm.set === false) {
+    setAlarm(null, null, true)
+  }
+}
+
+var processResponse = (text, url, name, alarm) => {
   console.log('process response', text, url)
   if (text) {
-    Mic.say(text, function() {
+    Mic.say(text, () => {
+      if (alarm) processAlarm(alarm)
+      global.COMPLETED = true
       if (url) {
         var player = new Player(url)
         player.play()
-        player.on('playend',function(item){});
+        player.on('playend',(item) => {});
       }
     })
   }

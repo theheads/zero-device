@@ -1,26 +1,32 @@
-'use strict';
+"use strict".
+/* global require */
+/* global __dirname */
+/* global process */
+/* global module */
+/* global global */
+
 
 const express = require('express')
-const Mic = require(__dirname + '/src/mic.js')
-const extend = require('util')._extend
-const exec = require('child_process').exec
-const security = require(__dirname + '/config/security.js')
-const setup = require(__dirname + '/config/setup.js')
-const cors = require('cors')
 const bodyParser = require('body-parser')
-const path = require('path')
-
-
-console.log('Initializing application...')
 const app = express()
+const Mic = require(__dirname + '/src/mic.js');
 
-require('./config/error-handler')(app)
-security(app)
+// const led = require(__dirname + '/config/led.js')
+var led = {
+  value: null,
+  init: function() {
+    this.value = 0
+  },
+  change: function(value) {
+    this.value = value
+    console.log('Led brightness is.. ' + this.value)
+  }
+}
+console.log('Initializing application...')
 
 
 app.set('port', process.env.PORT || 3001)
 app.use(bodyParser.json());
-
 
 // Cors support
 app.use(function(req, res, next) {
@@ -29,14 +35,17 @@ app.use(function(req, res, next) {
   next();
 });
 
-
-app.all('/', function(req, res) {
-  res.send()
-})
 app.all('/start', function(req, res) {
-  Mic.listen()
+  led.change(50)
+  if (global.COMPLETED === true) {
+    Mic.triggerListening()
+  }
+  // Mic.listen()
   res.send({})
+  led.change(0)
 })
+
+led.init()
 
 app.listen(process.env.PORT || 3001)
 
