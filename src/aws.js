@@ -9,7 +9,7 @@ var aws = {
       if (err) {
         console.log(err)
       } else {
-        console.log("Successfully uploaded data");
+        console.log("Successfully uploaded data", data);
       }
       callback()
     });

@@ -46,7 +46,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/theheads/zero"
+    "url": "https://github.com/theheads/zero-devicea"
   },
   "author": "Zero",
   "browserify-shim": {
@@ -65,7 +65,7 @@
   ],
   "license": "",
   "bugs": {
-    "url": "https://github.com/theheads/zero/issues"
+    "url": "https://github.com/theheads/zero-device/issues"
   },
   "scripts": {
     "start": "node server.js",
@@ -74,13 +74,14 @@
     "autofix": "eslint . --fix",
     "test-offline": "mocha test/offline-test.js",
     "snyk-protect": "snyk protect",
-    "prepublish": "npm run snyk-protect"
+    "prepublish": "npm run snyk-protect",
+    "github": "npm run prepublish && git push origin master",
+    "commit": "npm run prepublish && git add . && git commit -m 'automated commit'"
   },
   "devDependencies": {
-    "eslint": "^2.5.3",
     "jshint": "^2.9.2",
     "mocha": "^2.4.5",
-    "nock": "^7.7.2",
+    "mock": "^7.7.2",
     "supertest": "^1.2.0"
   },
   "snyk": true

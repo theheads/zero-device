@@ -1,11 +1,4 @@
 "use strict".
-/* global require */
-/* global __dirname */
-/* global process */
-/* global module */
-/* global global */
-
-
 const express = require('express')
 const bodyParser = require('body-parser')
 const app = express()

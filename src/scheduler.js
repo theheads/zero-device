@@ -1,5 +1,3 @@
-const schedule = require('node-schedule');
-
 module.exports = {
   schedules: {},
   scheduleJob: function(name, time, callback) {

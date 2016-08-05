@@ -1,5 +1,3 @@
-'use strict';
-
 var utils = require('./utils');
 var showerror = require('./views/showerror');
 var showError = showerror.showError;

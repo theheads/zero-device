@@ -5,12 +5,7 @@ const exec = require('child_process').exec
 const witSpeechAPI = require(__dirname + '/../services/witai-speech.js')
 const aws = require(__dirname + '/aws.js')
 const axios = require("axios")
-const natural = require('natural')
 const Player = require('player')
-const http = require('http')
-const request = require('request')
-const co = require('co')
-const open = require('open')
 const setAlarm = require(__dirname + "/../config/alarm")
 
 console.log("Initializing microphone")
@@ -139,7 +134,7 @@ var processResponse = (text, url, name, alarm) => {
   console.log('process response', text, url)
   if (text) {
     Mic.say(text, () => {
-      if (alarm) processAlarm(alarm)
+      if (alarm) { processAlarm(alarm) }
       global.COMPLETED = true
       if (url) {
         var player = new Player(url)

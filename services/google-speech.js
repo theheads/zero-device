@@ -1,7 +1,7 @@
-const axios = require("axios")
 const google = require('googleapis');
 const async = require('async');
 const fs = require('fs');
+const Buffer = require('buffer')
 
 var GoogleAPI = {
   process: function(callback) {
