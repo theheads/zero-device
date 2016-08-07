@@ -1,10 +1,9 @@
 const AWS = require('aws-sdk');
 const s3 = new AWS.S3();
-
-var aws = {
+const aws = {
   upload: function(name, file, user, callback) {
 
-    var params = {Bucket: 'zerorecordings' , Key: user + '/' + name, Body: file, public_url: true};
+    const params = {Bucket: 'zerorecordings' , Key: user + '/' + name, Body: file, public_url: true};
     s3.upload(params, function(err, data) {
       if (err) {
         console.log(err)

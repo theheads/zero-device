@@ -7,7 +7,7 @@ const csrf = require('csurf')
 const cookieParser = require('cookie-parser')
 const helmet = require('helmet')
 
-module.exports = function(app) {
+module.exports = (app) => {
   app.enable('trust proxy');
 
   // 1. redirects http to https
@@ -23,7 +23,7 @@ module.exports = function(app) {
   // 4. csrf
   // part 1: generate a csrf token for homepage views
   var csrfProtection = csrf({cookie: true});
-  app.get('/', csrfProtection, function(req, res, next) {
+  app.get('/', csrfProtection, (req, res, next) => {
     req._csrfToken = req.csrfToken();
     next();
   });

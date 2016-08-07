@@ -1,4 +1,3 @@
-"use strict".
 const express = require('express')
 const bodyParser = require('body-parser')
 const app = express()
@@ -7,10 +6,10 @@ const Mic = require(__dirname + '/src/mic.js');
 // const led = require(__dirname + '/config/led.js')
 var led = {
   value: null,
-  init: function() {
+  init: () => {
     this.value = 0
   },
-  change: function(value) {
+  change: (value) => {
     this.value = value
     console.log('Led brightness is.. ' + this.value)
   }
@@ -22,20 +21,22 @@ app.set('port', process.env.PORT || 3001)
 app.use(bodyParser.json());
 
 // Cors support
-app.use(function(req, res, next) {
+app.use((req, res, next) => {
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
   next();
 });
 
-app.all('/start', function(req, res) {
-  led.change(50)
+app.all('/start', (req, res) => {
+  // led.change(50) // trigger LED light
   if (global.COMPLETED === true) {
     Mic.triggerListening()
+  } else {
+    console.log('initial trigger still waiting')
+    // queue up listening or handle multipler responses?
   }
-  // Mic.listen()
   res.send({})
-  led.change(0)
+  // led.change(0) // trigger LED light
 })
 
 led.init()

@@ -34,6 +34,7 @@ var Mic = {
         var cmd = 'sox -b 16 -e signed -c 1 -r 44100 sound.raw -r 44100 sound.wav';
 
         exec(cmd, (error, stdout, stderr) => {
+          console.log(error, stdout, stderr)
           var stream  = fs.createReadStream(__dirname + '/../sound.wav')
           var file = ''
 
@@ -53,8 +54,10 @@ var Mic = {
               })
               .then((response) => {
                 processResponse(response.data.text)
+                callback()
               })
               .catch((error) => {
+                console.log(error)
                 processNoResponse()
               });
           })
@@ -83,6 +86,7 @@ var Mic = {
         var cmd = 'sox -b 16 -e signed -c 1 -r 44100 sound.raw -r 44100 sound.wav';
         count++
         exec(cmd, (error, stdout, stderr) => {
+          console.log(error, stdout, stderr)
           if (count === 1) {
             witSpeechAPI.process((err, text) => {
               console.log(text, 'text')
@@ -139,7 +143,7 @@ var processResponse = (text, url, name, alarm) => {
       if (url) {
         var player = new Player(url)
         player.play()
-        player.on('playend',(item) => {});
+        player.on('playend',(item) => { console.log('item finsihed' + item)});
       }
     })
   }

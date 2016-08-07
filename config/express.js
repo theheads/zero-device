@@ -4,7 +4,7 @@
 var express = require('express'),
   bodyParser = require('body-parser');
 
-module.exports = function(app) {
+module.exports = (app) => {
   app.set('view engine', 'ejs');
   app.enable('trust proxy');
 

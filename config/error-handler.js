@@ -1,9 +1,9 @@
 'use strict';
 
-module.exports = function(app) {
-
+module.exports = (app) => {
+  console.log("Do not user the error-handler.js module")
   // catch 404 and forward to error handler
-  // app.use(function(req, res, next) {
+  // app.use((req, res, next) => {
   //   var err = new Error('Not Found');
   //   err.code = 404;
   //   err.message = 'Not Found';
@@ -11,7 +11,7 @@ module.exports = function(app) {
   // });
 
   // error handler
-  // app.use(function(err, req, res, next) { // eslint-disable-line no-unused-vars
+  // app.use((err, req, res, next) => { // eslint-disable-line no-unused-vars
   //   var error = {
   //     code: err.code || 500,
   //     error: err.error || err.message

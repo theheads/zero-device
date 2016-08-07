@@ -1,6 +1,3 @@
-'use strict';
-
-
 console.log('Starting processes...')
 
 global.COMPLETED = true
@@ -20,4 +17,4 @@ switch (process.platform) {
     console.log("Please use a system that is supported (Linux/Mac)")
 }
 
-var app = require('./app.js');
+require('./app.js');

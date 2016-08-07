@@ -1,30 +1,30 @@
-var utils = require('./utils');
-var showerror = require('./views/showerror');
-var showError = showerror.showError;
+const utils = require('./utils');
+const showerror = require('./views/showerror');
+const showError = showerror.showError;
 
 // Mini WS callback API, so we can initialize
 // with model and token in URI, plus
 // start message
 
 // Initialize closure, which holds maximum getToken call count
-var tokenGenerator = utils.createTokenGenerator();
+const tokenGenerator = utils.createTokenGenerator();
 
-var initSocket = exports.initSocket = function(options, onopen, onlistening, onmessage, onerror, onclose) {
-  var listening;
-  // function withDefault(val, defaultVal) {
+const initSocket = exports.initSocket = (options, onopen, onlistening, onmessage, onerror, onclose) => {
+  const listening;
+  //  withDefault(val, defaultVal) {
   //   return typeof val === 'undefined' ? defaultVal : val;
   // }
-  var socket;
-  var token = options.token;
-  var model = options.model || localStorage.getItem('currentModel');
-  var message = options.message || {'action': 'start'};
-  // var sessionPermissions = withDefault(options.sessionPermissions,
+  const socket;
+  const token = options.token;
+  const model = options.model || localStorage.getItem('currentModel');
+  const message = options.message || {'action': 'start'};
+  // const sessionPermissions = withDefault(options.sessionPermissions,
   //   JSON.parse(localStorage.getItem('sessionPermissions')));
-  // var sessionPermissionsQueryParam = sessionPermissions ? '0' : '1';
+  // const sessionPermissionsQueryParam = sessionPermissions ? '0' : '1';
   // TODO: add '&X-Watson-Learning-Opt-Out=' + sessionPermissionsQueryParam once
   // we find why it's not accepted as query parameter
-  // var url = options.serviceURI || 'wss://stream-d.watsonplatform.net/speech-to-text/api/v1/recognize?watson-token=';
-  var url = options.serviceURI || 'wss://stream.watsonplatform.net/speech-to-text/api/v1/recognize?watson-token=';
+  // const url = options.serviceURI || 'wss://stream-d.watsonplatform.net/speech-to-text/api/v1/recognize?watson-token=';
+  const url = options.serviceURI || 'wss://stream.watsonplatform.net/speech-to-text/api/v1/recognize?watson-token=';
   url += token + '&model=' + model;
   console.log('URL model', model);
   try {
@@ -32,22 +32,22 @@ var initSocket = exports.initSocket = function(options, onopen, onlistening, onm
   } catch (err) {
     console.error('WS connection error: ', err);
   }
-  socket.onopen = function() {
+  socket.onopen = () {
     listening = false;
-    $.subscribe('hardsocketstop', function() {
+    $.subscribe('hardsocketstop', () {
       console.log('MICROPHONE: close.');
       socket.send(JSON.stringify({action:'stop'}));
       socket.close();
     });
-    $.subscribe('socketstop', function() {
+    $.subscribe('socketstop', () {
       console.log('MICROPHONE: close.');
       socket.close();
     });
     socket.send(JSON.stringify(message));
     onopen(socket);
   };
-  socket.onmessage = function(evt) {
-    var msg = JSON.parse(evt.data);
+  socket.onmessage = (evt) {
+    const msg = JSON.parse(evt.data);
     if (msg.error) {
       showError(msg.error);
       $.publish('hardsocketstop');
@@ -66,14 +66,14 @@ var initSocket = exports.initSocket = function(options, onopen, onlistening, onm
     onmessage(msg, socket);
   };
 
-  socket.onerror = function(evt) {
+  socket.onerror = (evt) => {
     console.log('WS onerror: ', evt);
     showError('Application error ' + evt.code + ': please refresh your browser and try again');
     $.publish('clearscreen');
     onerror(evt);
   };
 
-  socket.onclose = function(evt) {
+  socket.onclose = (evt) => {
     console.log('WS onclose: ', evt);
     if (evt.code === 1006) {
       // Authentication error, try to reconnect
@@ -82,7 +82,7 @@ var initSocket = exports.initSocket = function(options, onopen, onlistening, onm
         $.publish('hardsocketstop');
         throw new Error('No authorization token is currently available');
       }
-      tokenGenerator.getToken(function(err, token) {
+      tokenGenerator.getToken((err, token) => {
         if (err) {
           $.publish('hardsocketstop');
           return false;

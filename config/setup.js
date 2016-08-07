@@ -10,16 +10,16 @@ const cors = require('cors')
 const bodyParser = require('body-parser')
 const Microsoft = require(__dirname + '/../services/microsoft-speech.js')
 
-module.exports = function(app) {
+module.exports = (app) => {
   initialize(app)
 };
 
-function initialize(app) {
+const initialize = (app) =>{
   app.use(cors())
   app.use(bodyParser.urlencoded({extended: true, limit: '1mb'}));
   app.use(bodyParser.json({limit: '1mb'}));
 
-  app.all('/start', function(req, res) {
+  app.all('/start', (req, res) => {
     Mic.listen()
     res.send({})
   })

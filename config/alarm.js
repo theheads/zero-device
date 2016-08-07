@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 var sprintf = require('printf');
 var exec = require('child_process').exec;
-
+var Player = require('player'
+)
 module.exports = {
   interval: null,
   set: (hour, minute, cancel) => {
@@ -35,7 +36,7 @@ module.exports = {
         powerMinute
       );
 
-      exec(powerCmd, function(err) {
+      exec(powerCmd, (err) => {
         if (err) {
           throw err;
         }
@@ -46,14 +47,14 @@ module.exports = {
         process.setuid('felix');
       });
 
-      this.interval = setInterval(function() {
-        var now = new Date;
-        var hour = now.getHours();
-        var minute = now.getMinutes();
+      this.interval = setInterval(() =>{
+        const now = new Date();
+        const hour = now.getHours();
+        const minute = now.getMinutes();
 
-        if (hour == alarmHour) { //&& minute == alarmMinute) {
+        if (hour === alarmHour) { //&& minute == alarmMinute) {
           console.log(sprintf('Set alarm for %02d:%02d', alarmHour, alarmMinute || 0));
-          play(file);
+          play(__dirname + '../audio/news.mp3');
           clearInterval(this.interval);
         }
       }, 60000);
@@ -61,14 +62,14 @@ module.exports = {
   }
 }
 
-var play = file => {
-  if (!file)file = __dirname + '/../audio/espn.mp3'
+var play = (file) => {
+  if (!file) { file = __dirname + '/../audio/espn.mp3' }
 
   console.log('playing', file);
 
   var player = new Player(file)
   player.play()
-  player.on('playend',function(item){
-    console.log('alarm finished')
+  player.on('playend',(item) => {
+    console.log('alarm finished', item)
   });
 }
