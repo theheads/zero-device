@@ -79,6 +79,7 @@
     "commit": "npm run prepublish && git add . && git commit -m 'automated commit'"
   },
   "devDependencies": {
+    "debug": "^2.2.0",
     "jshint": "^2.9.2",
     "mocha": "^2.4.5",
     "mock": "^7.7.2",

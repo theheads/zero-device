@@ -9,9 +9,10 @@ const Player = require('player')
 const setAlarm = require(__dirname + "/../config/alarm")
 
 console.log("Initializing microphone")
+
 var Mic = {
   triggerListening: () => {
-    this.say('Hi', Mic.listen)
+    Mic.say('Hi', Mic.listen)
   },
   say: (text, callback) => {
     Say.speak(text, global.VOICE || 'kathy', 1, callback)
@@ -43,22 +44,24 @@ var Mic = {
           })
           stream.on('end',() => {
             var fileName = 'file' + Date.now() + '.wav'
-            var user = "johnnywu"
-            aws.upload(fileName, file, user, console.log)
+            var user = "user"
 
-            axios.post('http://3edcac4d.ngrok.io/record', {
+            // TODO: upload fix to AWS
+            // aws.upload(fileName, file, user, console.log)
+
+            axios.post('http://518fbf76.ngrok.io/record', {
             // axios.post('https://zero-api.herokuapp.com/record', {
                 file: fileName,
                 from: user,
                 to: toUser
               })
               .then((response) => {
-                processResponse(response.data.text)
+                console.log(response.data.url)
+                processResponse(response.data.text, response.data.url)
                 callback()
               })
               .catch((error) => {
-                console.log(error)
-                processNoResponse()
+                processNoResponse(error)
               });
           })
         });
@@ -85,16 +88,18 @@ var Mic = {
         micInstance.stop();
         var cmd = 'sox -b 16 -e signed -c 1 -r 44100 sound.raw -r 44100 sound.wav';
         count++
-        exec(cmd, (error, stdout, stderr) => {
-          console.log(error, stdout, stderr)
+        exec(cmd, (error) => {
+          if (error) { console.log(error) }
+
           if (count === 1) {
             witSpeechAPI.process((err, text) => {
               console.log(text, 'text')
+              global.COMPLETED = true
 
               if (text === '' || text === null || text === undefined) {
                 processNoResponse()
               } else {
-                // axios.post('https://d1b1fa90.ngrok.io/process', {text: text})
+                // axios.post('https://518fbf76.ngrok.io/process', {text: text})
                 axios.post('https://zero-api.herokuapp.com/process', {text: text})
                   .then((response) => {
                     var data = response.data
@@ -139,7 +144,6 @@ var processResponse = (text, url, name, alarm) => {
   if (text) {
     Mic.say(text, () => {
       if (alarm) { processAlarm(alarm) }
-      global.COMPLETED = true
       if (url) {
         var player = new Player(url)
         player.play()
