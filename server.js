@@ -6,7 +6,7 @@ switch (process.platform) {
   case "darwin":
     console.log('System detected is a Mac setup')
     global.SYSTEM = 'mac'
-    global.VOICE = 'kathy'
+    global.VOICE = 'Alex'
     break;
   case "linux":
     console.log("System detected is a Linux setup");

@@ -15,7 +15,7 @@ var Mic = {
     Mic.say('Hi', Mic.listen)
   },
   say: (text, callback) => {
-    Say.speak(text, global.VOICE || 'kathy', 1, callback)
+    Say.speak(text, global.VOICE, 1, callback)
   },
   record: (toUser, callback) => {
     var micInstance = mic({ 'rate': '44100', 'channels': '1', 'debug': true, 'exitOnSilence': 8 });
@@ -49,7 +49,7 @@ var Mic = {
             // TODO: upload fix to AWS
             // aws.upload(fileName, file, user, console.log)
 
-            axios.post('http://518fbf76.ngrok.io/record', {
+            axios.post('http://2f6936f2.ngrok.io/record', {
             // axios.post('https://zero-api.herokuapp.com/record', {
                 file: fileName,
                 from: user,
@@ -99,8 +99,8 @@ var Mic = {
               if (text === '' || text === null || text === undefined) {
                 processNoResponse()
               } else {
-                // axios.post('https://518fbf76.ngrok.io/process', {text: text})
-                axios.post('https://zero-api.herokuapp.com/process', {text: text})
+                axios.post('https://2f6936f2.ngrok.io/process', {text: text})
+                // axios.post('https://zero-api.herokuapp.com/process', {text: text})
                   .then((response) => {
                     var data = response.data
                     if (data.text === 'no_match') {
