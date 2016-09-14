@@ -1,11 +1,11 @@
-#!/usr/bin/env node
 var sprintf = require('printf');
 var exec = require('child_process').exec;
-var Player = require('player'
-)
+var Player = require('player')
+
 module.exports = {
   interval: null,
   set: (hour, minute, cancel) => {
+    console.log(hour, minute)
     if (cancel === true) {
       clearInterval(this.interval)
     }
@@ -31,20 +31,20 @@ module.exports = {
       }
 
       var powerCmd = sprintf(
-        'pmset repeat wakeorpoweron MTWRFSU %02d:%02d:00',
+        'sudo pmset repeat wakeorpoweron MTWRFSU %02d:%02d:00',
         powerHour,
         powerMinute
       );
 
       exec(powerCmd, (err) => {
         if (err) {
-          throw err;
+          console.err(err);
         }
 
         console.log(sprintf('Set alarm for %02d:%02d', alarmHour, alarmMinute));
         console.log(sprintf('Set wakup for %02d:%02d', powerHour, powerMinute));
 
-        process.setuid('felix');
+        // process.setuid('felix');
       });
 
       this.interval = setInterval(() =>{
@@ -54,7 +54,7 @@ module.exports = {
 
         if (hour === alarmHour) { //&& minute == alarmMinute) {
           console.log(sprintf('Set alarm for %02d:%02d', alarmHour, alarmMinute || 0));
-          play(__dirname + '../audio/news.mp3');
+          play('https://s3-us-west-2.amazonaws.com/zerorecordings/johnnywu/birds.wav');
           clearInterval(this.interval);
         }
       }, 60000);
@@ -70,6 +70,7 @@ var play = (file) => {
   var player = new Player(file)
   player.play()
   player.on('playend',(item) => {
+    // call next or complete
     console.log('alarm finished', item)
   });
 }

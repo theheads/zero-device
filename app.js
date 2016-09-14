@@ -3,17 +3,12 @@ const express = require('express')
 const bodyParser = require('body-parser')
 const app = express()
 const Mic = require(__dirname + '/src/mic.js');
+const Alarm = require(__dirname + '/config/alarm.js')
+const Player = require(__dirname + '/src/player.js')
 
-var led = {
-  value: null,
-  init: () => {
-    this.value = 0
-  },
-  change: (value) => {
-    this.value = value
-    console.log('Led brightness is.. ' + this.value)
-  }
-}
+Alarm.set(18, 25)
+console.log('alarm')
+
 console.log('Initializing application...')
 
 app.on('prompt', function(req) {
@@ -29,6 +24,21 @@ app.use((req, res, next) => {
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
   next();
 });
+
+app.all('/alarm', (req, res) => {
+  if (req.body.stop === true) {
+    Player.stop()
+  }
+  if (req.body.pause === true) {
+    Player.pause()
+  }
+  if (req.body.next === true && req.body.url) {
+    Player.play(req.body.url)
+  }
+  if (req.body.start === true && req.body.url) {
+    Player.play(req.body.url)
+  }
+})
 
 app.all('/start', (req, res) => {
   if (global.COMPLETED === true) {

@@ -5,7 +5,7 @@ const fs = require("fs")
 var WIT = module.exports = {
   process: function(callback) {
     var header =  {
-      'Authorization': 'Bearer 5XT3LFOXIVPX6OIC53ZHXWBHBTBG6JXF',
+     'Authorization': 'Bearer 5XT3LFOXIVPX6OIC53ZHXWBHBTBG6JXF',
      'accept': 'application/json',
      'Content-Type': 'audio/wav'
     }

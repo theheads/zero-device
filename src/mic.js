@@ -48,7 +48,6 @@ var Mic = {
 
             // TODO: upload fix to AWS
             // aws.upload(fileName, file, user, console.log)
-
             axios.post('http://2f6936f2.ngrok.io/record', {
             // axios.post('https://zero-api.herokuapp.com/record', {
                 file: fileName,

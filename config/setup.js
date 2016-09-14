@@ -9,7 +9,6 @@ const express = require('express')
 const cors = require('cors')
 const bodyParser = require('body-parser')
 const Microsoft = require(__dirname + '/../services/microsoft-speech.js')
-
 module.exports = (app) => {
   initialize(app)
 };
@@ -25,12 +24,8 @@ const initialize = (app) =>{
   })
 
 
-  // Trial ended
-  // Microsoft.init()
-
   security(app)
   errors(app)
   // Mic.listen()
-  // Mic.record('Kush')
   // Mic.alwaysListening()
 }
