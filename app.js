@@ -6,6 +6,17 @@ const Mic = require(__dirname + '/src/mic.js');
 const Alarm = require(__dirname + '/config/alarm.js')
 const Player = require(__dirname + '/src/player.js')
 
+const zetta = require('zetta');
+const LED = require('zetta-led-mock-driver');
+
+zetta()
+  .name('Device')
+  .use(LED)
+  .link('http://hello-zetta.herokuapp.com/')
+  .listen(1338, function(){
+     console.log('Zetta is running at http://127.0.0.1:1337');
+});
+
 Alarm.set(18, 25)
 console.log('alarm')
 
