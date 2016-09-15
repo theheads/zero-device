@@ -70,7 +70,7 @@
     "url": "https://github.com/theheads/zero-device/issues"
   },
   "scripts": {
-    "start": "node server.js",
+    "start": "NODE_PATH=zero-device node server.js",
     "test": "snyk test && npm run lint && npm run test-offline",
     "lint": "eslint .",
     "autofix": "eslint . --fix",

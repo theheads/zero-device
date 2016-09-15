@@ -48,7 +48,7 @@ var Mic = {
 
             // TODO: upload fix to AWS
             // aws.upload(fileName, file, user, console.log)
-            axios.post('http://2f6936f2.ngrok.io/record', {
+            axios.post('http://af542d74.ngrok.io/record', {
             // axios.post('https://zero-api.herokuapp.com/record', {
                 file: fileName,
                 from: user,
@@ -98,7 +98,7 @@ var Mic = {
               if (text === '' || text === null || text === undefined) {
                 processNoResponse()
               } else {
-                axios.post('https://2f6936f2.ngrok.io/process', {text: text})
+                axios.post('https://af542d74.ngrok.io/process', {text: text})
                 // axios.post('https://zero-api.herokuapp.com/process', {text: text})
                   .then((response) => {
                     var data = response.data
