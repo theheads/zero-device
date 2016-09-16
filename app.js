@@ -44,7 +44,7 @@ const LED = require('zetta-led-mock-driver');
 //      console.log('Zetta is running at http://127.0.0.1:1338');
 // });
 
-Alarm.set(18, 25)
+// Alarm.set(18, 25)
 console.log('alarm')
 
 console.log('Initializing application...')
@@ -63,57 +63,43 @@ app.use((req, res, next) => {
   next();
 });
 
-app.all('/alarm', (req, res) => {
-  if (req.body.stop === true) {
-    Player.stop()
-  }
-  if (req.body.pause === true) {
-    Player.pause()
-  }
-  if (req.body.next === true && req.body.url) {
-    Player.play(req.body.url)
-  }
-  if (req.body.start === true && req.body.url) {
-    Player.play(req.body.url)
-  }
-})
-
-
+//
 const axios = require('axios')
-const player = require('player')
-
-var callbackNext = function() {
-  axios.post('https://af542d74.ngrok.io/process', {text: 'next'})
-    .then((response) => {
-      var data = response.data
-      callback(data)
-    })
-}
-var callback = function(data) {
-  console.log(data.url, data.text)
-  Mic.say(data.text, () => {
-    if (data.url) {
-      var player1 = new player(data.url)
-      player1.play()
-      setTimeout(function(){ player1.stop()},5000)
-      player1.on('playend',(item) => {
-        console.log('completed')
-        apiCall(callbackNext)
-      });
-    }
-  })
-}
-
-
-var apiCall = function(callback) {
-axios.post('https://af542d74.ngrok.io/process', {text: 'start routine'})
-  .then((response) => {
-    var data = response.data
-    callback(data)
-  })
-}
-
-apiCall(callback)
+// const player = require('player')
+//
+// var callbackNext = function() {
+//   axios.post('https://af542d74.ngrok.io/process', {text: 'next'})
+//     .then((response) => {
+//       var data = response.data
+//       callback(data)
+//     })
+// }
+// var callback = function(data) {
+//   console.log(data.url, data.text)
+//   Mic.say(data.text, () => {
+//     if (data.url) {
+//       var player1 = new player(data.url)
+//       player1.play()
+//       setTimeout(function(){ player1.stop();
+//         callbackNext()
+//       },5000)
+//       player1.on('playend',(item) => {
+//         console.log('completed')
+//       });
+//     }
+//   })
+// }
+//
+//
+// var apiCall = function(callback) {
+// axios.post('https://af542d74.ngrok.io/process', {text: 'start routine'})
+//   .then((response) => {
+//     var data = response.data
+//     callback(data)
+//   })
+// }
+//
+// apiCall(callback)
 
 app.all('/start', (req, res) => {
   if (global.COMPLETED === true) {
@@ -123,6 +109,25 @@ app.all('/start', (req, res) => {
   }
   res.send({})
 })
+
+app.all('/alarm', (req, res) => {
+  var steps = req.body.steps
+  if (req.body.action === 'stop') {
+    Player.stop()
+  }
+  if (req.body.action === 'pause') {
+    Player.pause()
+  }
+  // if (req.body.action === 'next' && req.body.url) {
+  //   Player.play(req.body.url)
+  // }
+  if (req.body.action === 'start' && req.body.steps) {
+    Player.play([steps[0][1], steps[1][1], steps[2][1]],
+      [steps[0][0], steps[1][0], steps[2][0]])
+  }
+  res.send({})
+})
+
 
 app.listen(process.env.PORT || 3001)
 
