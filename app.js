@@ -7,45 +7,14 @@ const Alarm = require(__dirname + '/config/alarm.js')
 const Player = require(__dirname + '/src/player.js')
 const zetta = require('zetta');
 const LED = require('zetta-led-mock-driver');
-//
-//
-// var StateMachineScout = require(__dirname + '/zetta/scout.js')
-// var StateMachineDevice =require(__dirname + '/zetta/device.js')
-// var StateMachineApp = function(server) {
-//
-//   var StateMachine_1_Query = server.where({type: 'state_machine', name: 'machine_1'});
-//   var StateMachine_2_Query = server.where({type: 'state_machine', name: 'machine_2'});
-//   var StateMachine_3_Query = server.where({type: 'state_machine', name: 'machine_3'});
-//
-//   server.observe([StateMachine_1_Query, StateMachine_2_Query, StateMachine_3_Query], function(machine_1, machine_2, machine_3) {
-//
-//     console.log("State Machine came online: " + machine_1.name + ", " + machine_2.name + ", " + machine_3.name);
-//     machine_1.on('turn-off', function() {
-//       machine_2.call('turn-off');
-//       machine_3.call('turn-off');
-//     });
-//
-//     machine_1.on('turn-on', function() {
-//       machine_2.call('turn-on');
-//       machine_3.call('turn-on');
-//     });
-//   });
-// }
-//
-//
-// zetta()
-//   .name('State Machine Server')
-//   .use(StateMachineDevice)
-//   .use(StateMachineApp)
-//   .use(StateMachineScout)
-//   .use(LED)
-//   .link('http://hello-zetta.herokuapp.com/')
-//   .listen(1338, function(){
-//      console.log('Zetta is running at http://127.0.0.1:1338');
-// });
 
-// Alarm.set(18, 25)
-console.log('alarm')
+zetta()
+  .name('Device')
+  .use(LED)
+  .link('http://hello-zetta.herokuapp.com/')
+  .listen(1338, function(){
+     console.log('Zetta is running at http://127.0.0.1:1338');
+});
 
 console.log('Initializing application...')
 
@@ -111,23 +80,33 @@ app.all('/start', (req, res) => {
 })
 
 app.all('/alarm', (req, res) => {
-  var steps = req.body.steps
   if (req.body.action === 'stop') {
     Player.stop()
   }
   if (req.body.action === 'pause') {
     Player.pause()
   }
-  // if (req.body.action === 'next' && req.body.url) {
-  //   Player.play(req.body.url)
-  // }
   if (req.body.action === 'start' && req.body.steps) {
-    Player.play([steps[0][1], steps[1][1], steps[2][1]],
-      [steps[0][0], steps[1][0], steps[2][0]])
+    routineManager.steps = req.body.steps
+    routineManager.nextStep()
   }
   res.send({})
 })
 
+
+var routineManager = {
+  steps: [],
+  count: 0,
+  nextStep: function() {
+    console.log(this.steps, this.count)
+    if (this.steps[this.count].match(/http/)) {
+      Player.play(this.steps[this.count], this.nextStep.bind(this))
+    } else {
+      Mic.say(this.steps[this.count], this.nextStep.bind(this))
+    }
+    this.count++
+  }
+}
 
 app.listen(process.env.PORT || 3001)
 

@@ -3,25 +3,14 @@ const mic = require(__dirname + '/mic.js')
 
 module.exports = {
   player: null,
-  play: function(url, text) {
-    var count = 0
-    mic.say(text[count])
-
+  play: function(url, callback) {
     this.player = new Player(url)
-    this.player.play()
-
-    // event: on playing
-    this.player.on('playing',function(item){
-      console.log('im playing... src:' + item);
+    this.player.play(function(err, player){
+      callback()
     });
-
-    // event: on playend
-    this.player.on('playend',function(item){
-      count++
-      mic.say(text[count])
-      console.log('src:' + item + ' play done, switching to next one ...');
-    });
-
+    this.player.on('error', function(err) {
+      callback()
+    })
   },
   stop: function() {
     this.player.stop()
