@@ -8,29 +8,31 @@ const Player = require(__dirname + '/src/player.js')
 const zetta = require('zetta');
 const LED = require('zetta-led-mock-driver');
 
-zetta()
-  .name('Device')
-  .use(LED)
-  .link('http://hello-zetta.herokuapp.com/')
-  .listen(1338, function(){
-     console.log('Zetta is running at http://127.0.0.1:1338');
-});
+const mqtt = require('mqtt')
+const client = mqtt.connect('mqtt://broker.hivemq.com')
+
+client.on('connect', () => {
+  client.publish('alarm/connected', 'true')
+})
+
+client.on('message', (topic, message) => {
+  console.log('received message %s %s', topic, message)
+})
+
+client.publish('alarm/connected', 'true')
+
+
+
+// zetta()
+//   .name('Device')
+//   .use(LED)
+//   .link('http://hello-zetta.herokuapp.com/')
+//   .listen(1338, function(){
+//      console.log('Zetta is running at http://127.0.0.1:1338');
+// });
 
 console.log('Initializing application...')
 
-app.on('prompt', function(req) {
-  // trigger API request for prompt
-})
-
-app.set('port', process.env.PORT || 3001)
-app.use(bodyParser.json());
-
-// Cors support
-app.use((req, res, next) => {
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-  next();
-});
 
 //
 const axios = require('axios')
@@ -70,6 +72,16 @@ const axios = require('axios')
 //
 // apiCall(callback)
 
+app.set('port', process.env.PORT || 3001)
+app.use(bodyParser.json());
+
+// Cors support
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  next();
+});
+
 app.all('/start', (req, res) => {
   if (global.COMPLETED === true) {
     Mic.triggerListening()
@@ -80,6 +92,9 @@ app.all('/start', (req, res) => {
 })
 
 app.all('/alarm', (req, res) => {
+  console.log('got here')
+  client.publish('alarm/connected', 'true')
+  client.publish('alarm/state', 'on')
   if (req.body.action === 'stop') {
     Player.stop()
   }
@@ -104,9 +119,18 @@ var routineManager = {
     } else {
       Mic.say(this.steps[this.count], this.nextStep.bind(this))
     }
+    if (this.count === this.steps.length && this.steps.length !== 0) {
+      client.publish('alarm/state', 'off')
+    }
     this.count++
   }
 }
+
+
+process.on('exit', function() {
+  client.publish('alarm/connected', 'false')
+  // Add shutdown logic here.
+});
 
 app.listen(process.env.PORT || 3001)
 
